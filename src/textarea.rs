@@ -806,6 +806,23 @@ impl<'a> TextArea<'a> {
         }
     }
 
+    /// Added by me, Windy
+    pub fn set_content<S: AsRef<str>>(&mut self, s: S) -> bool {
+        if self.lines().join("\n") == s.as_ref() {
+            return false;
+        }
+
+        // Clear everything
+        self.select_all();
+        self.delete_selection(false);
+
+        // Reset cursor to start
+        self.cursor = (0, 0);
+
+        // Insert new content
+        self.insert_str(s)
+    }
+
     fn insert_chunk(&mut self, chunk: Vec<String>) -> bool {
         debug_assert!(chunk.len() > 1, "Chunk size must be > 1: {:?}", chunk);
 
