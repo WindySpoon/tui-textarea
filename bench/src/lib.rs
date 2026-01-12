@@ -40,8 +40,10 @@ impl Default for DummyBackend {
 }
 
 impl Backend for DummyBackend {
+    type Error = io::Error;
+
     #[inline]
-    fn draw<'a, I>(&mut self, _content: I) -> io::Result<()>
+    fn draw<'a, I>(&mut self, _content: I) -> Result<(), Self::Error>
     where
         I: Iterator<Item = (u16, u16, &'a Cell)>,
     {
@@ -49,33 +51,33 @@ impl Backend for DummyBackend {
     }
 
     #[inline]
-    fn hide_cursor(&mut self) -> io::Result<()> {
+    fn hide_cursor(&mut self) -> Result<(), Self::Error> {
         Ok(())
     }
 
     #[inline]
-    fn show_cursor(&mut self) -> io::Result<()> {
+    fn show_cursor(&mut self) -> Result<(), Self::Error> {
         Ok(())
     }
 
     #[inline]
-    fn get_cursor(&mut self) -> io::Result<(u16, u16)> {
+    fn get_cursor(&mut self) -> Result<(u16, u16), Self::Error> {
         Ok(self.cursor)
     }
 
     #[inline]
-    fn set_cursor(&mut self, x: u16, y: u16) -> io::Result<()> {
+    fn set_cursor(&mut self, x: u16, y: u16) -> Result<(), Self::Error> {
         self.cursor = (x, y);
         Ok(())
     }
 
     #[inline]
-    fn clear(&mut self) -> io::Result<()> {
+    fn clear(&mut self) -> Result<(), Self::Error> {
         Ok(())
     }
 
     #[inline]
-    fn size(&self) -> io::Result<Size> {
+    fn size(&self) -> Result<Size, Self::Error> {
         Ok(Size {
             width: self.width,
             height: self.height,
@@ -83,7 +85,7 @@ impl Backend for DummyBackend {
     }
 
     #[inline]
-    fn window_size(&mut self) -> io::Result<WindowSize> {
+    fn window_size(&mut self) -> Result<WindowSize, Self::Error> {
         Ok(WindowSize {
             columns_rows: Size {
                 width: self.width,
@@ -97,20 +99,28 @@ impl Backend for DummyBackend {
     }
 
     #[inline]
-    fn flush(&mut self) -> io::Result<()> {
+    fn flush(&mut self) -> Result<(), Self::Error> {
         Ok(())
     }
 
     #[inline]
-    fn get_cursor_position(&mut self) -> io::Result<Position> {
+    fn get_cursor_position(&mut self) -> Result<Position, Self::Error> {
         let (x, y) = self.cursor;
         Ok(Position { x, y })
     }
 
     #[inline]
-    fn set_cursor_position<P: Into<Position>>(&mut self, position: P) -> io::Result<()> {
+    fn set_cursor_position<P: Into<Position>>(&mut self, position: P) -> Result<(), Self::Error> {
         let Position { x, y } = position.into();
         self.cursor = (x, y);
+        Ok(())
+    }
+
+    #[inline]
+    fn clear_region(
+        &mut self,
+        _clear_type: ratatui::prelude::backend::ClearType,
+    ) -> Result<(), Self::Error> {
         Ok(())
     }
 }
